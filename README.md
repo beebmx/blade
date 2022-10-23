@@ -49,10 +49,6 @@ Current date: @datetime($date)
 
 The Blade instances passes all methods to the internal view factory. So methods such as `exists`, `file`, `share`, `composer` and `creator` are available as well. Check out the [original documentation](https://laravel.com/docs/9.x/views) for more information.
 
-## Integrations
-
-- [Phalcon Slayer Framework](https://github.com/phalconslayer/slayer) comes out of the box with Blade.
-
 ## Testing
 
 ```bash
