@@ -22,8 +22,7 @@ Create a Blade instance by passing it the folder(s) where your view files are lo
 use Beebmx\Blade\Application;
 use Beebmx\Blade\Blade;
 
-$application = new Application;
-$blade = new Blade('views', 'cache', $application);
+$blade = new Blade('views', 'cache');
 
 echo $blade->make('homepage', ['name' => 'John Doe'])->render();
 ```

@@ -3,7 +3,6 @@
 namespace Beebmx\Blade;
 
 use Illuminate\Config\Repository;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\Container as ContainerInterface;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Contracts\View\View;

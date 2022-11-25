@@ -178,4 +178,11 @@ class BladeTest extends TestCase
 
         $this->assertEquals($output, $this->expected('extends'));
     }
+
+    public function testBasicWithoutSetApplication()
+    {
+        $blade = new Blade('tests/views', 'tests/cache');
+        $output = $blade->make('basic');
+        $this->assertEquals('hello world', trim($output));
+    }
 }
