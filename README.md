@@ -1,7 +1,7 @@
 # Blade
 
 [![Latest Stable Version](https://poser.pugx.org/beebmx/blade/v)](//packagist.org/packages/beebmx/blade)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/beebmx/blade/tests.yml?branch=master)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/beebmx/blade/tests.yml?branch=main)
 [![Total Downloads](http://poser.pugx.org/beebmx/blade/downloads)](https://packagist.org/packages/beebmx/blade)
 [![License](https://poser.pugx.org/beebmx/blade/license)](//packagist.org/packages/beebmx/blade)
 
