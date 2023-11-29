@@ -1,7 +1,8 @@
 # Blade
 
 [![Latest Stable Version](https://poser.pugx.org/beebmx/blade/v)](//packagist.org/packages/beebmx/blade)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/beebmx/blade/run-tests?label=tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/beebmx/blade/run-tests.yml?branch=master)
+[![Total Downloads](http://poser.pugx.org/beebmx/blade/downloads)](https://packagist.org/packages/beebmx/blade)
 [![License](https://poser.pugx.org/beebmx/blade/license)](//packagist.org/packages/beebmx/blade)
 
 The standalone version of [Laravel's Blade templating engine](https://laravel.com/docs/9.x/blade) for use outside of Laravel.
