@@ -3,7 +3,9 @@
 namespace Beebmx\Blade;
 
 use Illuminate\Config\Repository;
+use Illuminate\Container\Container as AppContainer;
 use Illuminate\Contracts\Container\Container as ContainerInterface;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory as FactoryContract;
 use Illuminate\Contracts\View\View;
 use Illuminate\Events\Dispatcher;
@@ -30,9 +32,10 @@ class Blade implements FactoryContract
      */
     private $compiler;
 
-    public function __construct($viewPaths, string $cachePath, ContainerInterface $container = null)
+    public function __construct($viewPaths, string $cachePath, ?ContainerInterface $container = null)
     {
-        $this->container = $container ?: new Application;
+        $this->container = $container ?: new Container;
+        AppContainer::setInstance($this->container);
 
         $this->setupContainer((array) $viewPaths, $cachePath);
         (new ViewServiceProvider($this->container))->register();
@@ -56,12 +59,12 @@ class Blade implements FactoryContract
         return $this->compiler;
     }
 
-    public function directive(string $name, callable $handler)
+    public function directive(string $name, callable $handler): void
     {
         $this->compiler->directive($name, $handler);
     }
 
-    public function if($name, callable $callback)
+    public function if($name, callable $callback): void
     {
         $this->compiler->if($name, $callback);
     }
@@ -110,23 +113,17 @@ class Blade implements FactoryContract
         return call_user_func_array([$this->factory, $method], $params);
     }
 
-    protected function setupContainer(array $viewPaths, string $cachePath, string $basePath = '')
+    protected function setupContainer(array $viewPaths, string $cachePath, string $basePath = ''): void
     {
-        $this->container->bindIf('files', function () {
-            return new Filesystem;
-        }, true);
+        $this->container->bindIf('files', fn () => new Filesystem);
 
-        $this->container->bindIf('events', function () {
-            return new Dispatcher;
-        }, true);
+        $this->container->bindIf('events', fn () => new Dispatcher);
 
-        $this->container->bindIf('config', function ($app) use ($viewPaths, $cachePath, $basePath) {
-            return new Repository([
-                'view.paths' => $viewPaths,
-                'view.compiled' => $cachePath,
-                'view.relative_hash' => $basePath,
-            ]);
-        }, true);
+        $this->container->bindIf('config', fn ($app) => new Repository([
+            'view.paths' => $viewPaths,
+            'view.compiled' => $cachePath,
+            'view.relative_hash' => $basePath,
+        ]));
 
         Facade::setFacadeApplication($this->container);
     }

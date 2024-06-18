@@ -1,188 +1,157 @@
 <?php
 
-use Beebmx\Blade\Application;
+use Beebmx\Blade\Blade;
+use Beebmx\Blade\Container;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Factory;
 use Illuminate\View\View;
-use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\ViewFinderInterface;
-use Beebmx\Blade\Blade;
-use PHPUnit\Framework\TestCase;
 
-class BladeTest extends TestCase
-{
-    /**
-     * @var Blade
-     */
-    private $blade;
+beforeEach(function () {
+    $this->blade = new Blade('tests/fixtures/views', 'tests/fixtures/cache', new Container);
 
-    protected function setUp(): void
-    {
-        $this->blade = new Blade('tests/views', 'tests/cache', new Application);
+    $this->blade->directive('datetime', function ($expression) {
+        return "<?php echo with({$expression})->format('F d, Y g:i a'); ?>";
+    });
 
-        $this->blade->directive('datetime', function ($expression) {
-            return "<?php echo with({$expression})->format('F d, Y g:i a'); ?>";
-        });
+    $this->blade->if('ifdate', function ($date) {
+        return $date instanceof DateTime;
+    });
+});
 
-        $this->blade->if('ifdate', function ($date) {
-            return $date instanceof DateTime;
-        });
-    }
+test('compiler getter', function () {
+    expect($this->blade->compiler())
+        ->toBeInstanceOf(BladeCompiler::class);
+});
 
-    public function testCompilerGetter()
-    {
-        $this->assertInstanceOf(BladeCompiler::class, $this->blade->compiler());
-    }
+test('basic rendering', function () {
+    expect(trim($this->blade->make('basic')))
+        ->toEqual('hello world');
+});
 
-    public function testBasic()
-    {
-        $output = $this->blade->make('basic');
-        $this->assertEquals('hello world', trim($output));
-    }
+test('exists', function () {
+    expect($this->blade->exists('nonexistentview'))
+        ->toBeFalse();
+});
 
-    public function testExists()
-    {
-        $this->assertFalse($this->blade->exists('nonexistentview'));
-    }
+test('variables', function () {
+    expect(trim($this->blade->make('variables', ['name' => 'John Doe'])))
+        ->toEqual('hello John Doe');
+});
 
-    public function testVariables()
-    {
-        $output = $this->blade->make('variables', ['name' => 'John Doe']);
-        $this->assertEquals('hello John Doe', trim($output));
-    }
+test('non blade', function () {
+    expect(trim($this->blade->make('plain')))
+        ->toEqual('{{ this is plain php }}');
+});
 
-    public function testNonBlade()
-    {
-        $output = $this->blade->make('plain');
-        $this->assertEquals('{{ this is plain php }}', trim($output));
-    }
+test('file', function () {
+    expect(trim($this->blade->file('tests/fixtures/views/basic.blade.php')))
+        ->toEqual('hello world');
+});
 
-    public function testFile()
-    {
-        $output = $this->blade->file('tests/views/basic.blade.php');
-        $this->assertEquals('hello world', trim($output));
-    }
+test('share', function () {
+    $this->blade->share('name', 'John Doe');
 
-    public function testShare()
-    {
-        $this->blade->share('name', 'John Doe');
+    expect(trim($this->blade->make('variables')))
+        ->toEqual('hello John Doe');
+});
 
-        $output = $this->blade->make('variables');
-        $this->assertEquals('hello John Doe', trim($output));
-    }
+test('composer', function () {
+    $this->blade->composer('variables', function (View $view) {
+        $view->with('name', 'John Doe and '.$view->offsetGet('name'));
+    });
 
-    public function testComposer()
-    {
-        $this->blade->composer('variables', function (View $view) {
-            $view->with('name', 'John Doe and ' . $view->offsetGet('name'));
-        });
+    expect(trim($this->blade->make('variables', ['name' => 'Jane Doe'])))
+        ->toEqual('hello John Doe and Jane Doe');
+});
 
-        $output = $this->blade->make('variables', ['name' => 'Jane Doe']);
-        $this->assertEquals('hello John Doe and Jane Doe', trim($output));
-    }
+test('creator', function () {
+    $this->blade->creator('variables', function (View $view) {
+        $view->with('name', 'John Doe');
+    });
 
-    public function testCreator()
-    {
-        $this->blade->creator('variables', function (View $view) {
-            $view->with('name', 'John Doe');
-        });
-        $this->blade->composer('variables', function (View $view) {
-            $view->with('name', 'Jane Doe and ' . $view->offsetGet('name'));
-        });
+    $this->blade->composer('variables', function (View $view) {
+        $view->with('name', 'Jane Doe and '.$view->offsetGet('name'));
+    });
 
-        $output = $this->blade->make('variables');
-        $this->assertEquals('hello Jane Doe and John Doe', trim($output));
-    }
+    expect(trim($this->blade->make('variables')))
+        ->toEqual('hello Jane Doe and John Doe');
+});
 
-    public function testRenderAlias()
-    {
-        $output = $this->blade->render('basic');
-        $this->assertEquals('hello world', trim($output));
-    }
+test('render alias', function () {
+    expect(trim($this->blade->render('basic')))
+        ->toEqual('hello world');
+});
 
-    public function testDirective()
-    {
-        $output = $this->blade->make('directive', ['birthday' => new DateTime('1989/08/19')]);
-        $this->assertEquals('Your birthday is August 19, 1989 12:00 am', trim($output));
-    }
+test('directive', function () {
+    expect(trim($this->blade->make('directive', ['birthday' => new DateTime('1980/01/01')])))
+        ->toEqual('Your birthday is January 01, 1980 12:00 am');
+});
 
-    public function testIf()
-    {
-        $output = $this->blade->make('if', ['birthday' => new DateTime('1989/08/19')]);
-        $this->assertEquals('Birthday August 19, 1989 12:00 am detected', trim($output));
-    }
+test('if', function () {
+    expect(trim($this->blade->make('if', ['birthday' => new DateTime('1989/08/19')])))
+        ->toEqual('Birthday August 19, 1989 12:00 am detected');
+});
 
-    public function testAddNamespace()
-    {
-        $this->blade->addNamespace('other', 'tests/views/other');
+test('add namespace', function () {
+    $this->blade->addNamespace('other', 'tests/fixtures/views/other');
 
-        $output = $this->blade->make('other::basic');
-        $this->assertEquals('hello other world', trim($output));
-    }
+    expect(trim($this->blade->make('other::basic')))
+        ->toEqual('hello other world');
+});
 
-    public function testReplaceNamespace()
-    {
-        $this->blade->addNamespace('other', 'tests/views/other');
-        $this->blade->replaceNamespace('other', 'tests/views/another');
+test('replace namespace', function () {
+    $this->blade->addNamespace('other', 'tests/fixtures/views/other');
+    $this->blade->replaceNamespace('other', 'tests/fixtures/views/another');
 
-        $output = $this->blade->make('other::basic');
-        $this->assertEquals('hello another world', trim($output));
-    }
+    expect(trim($this->blade->make('other::basic')))
+        ->toEqual('hello another world');
+});
 
-    public function testViewGetter()
-    {
-        /** @var Factory $view */
-        $view = $this->blade;
+test('view getter', function () {
+    /** @var Factory $view */
+    $view = $this->blade;
 
-        $this->assertInstanceOf(ViewFinderInterface::class, $view->getFinder());
-    }
+    expect($view->getFinder())
+        ->toBeInstanceOf(ViewFinderInterface::class);
+});
 
-    public function testOther()
-    {
-        $users = [
-            [
-                'id' => 1,
-                'name' => 'John Doe',
-                'email' => 'john.doe@doe.com',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Jen Doe',
-                'email' => 'jen.doe@example.com',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Jerry Doe',
-                'email' => 'jerry.doe@doe.com',
-            ],
-        ];
+test('other', function () {
+    $users = [
+        [
+            'id' => 1,
+            'name' => 'John Doe',
+            'email' => 'john.doe@doe.com',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Jen Doe',
+            'email' => 'jen.doe@example.com',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Jerry Doe',
+            'email' => 'jerry.doe@doe.com',
+        ],
+    ];
 
-        $output = $this->blade->make('other', [
-            'users' => $users,
-            'name' => '<strong>John</strong>',
-            'authenticated' => false,
-        ]);
+    $output = $this->blade->make('other', [
+        'users' => $users,
+        'name' => '<strong>John</strong>',
+        'authenticated' => false,
+    ]);
 
-        $this->assertEquals($output, $this->expected('other'));
-    }
+    expect((string) $output)
+        ->toEqual(expected('other'));
+});
 
-    private function expected(string $file): string
-    {
-        $file_path = __DIR__ . '/expected/' . $file . '.html';
+test('extends', function () {
+    expect($this->blade->make('extends'))
+        ->toEqual(expected('extends'));
+});
 
-        return file_get_contents($file_path);
-    }
-
-    public function testExtends()
-    {
-        $output = $this->blade->make('extends');
-
-        $this->assertEquals($output, $this->expected('extends'));
-    }
-
-    public function testBasicWithoutSetApplication()
-    {
-        $blade = new Blade('tests/views', 'tests/cache');
-        $output = $blade->make('basic');
-        $this->assertEquals('hello world', trim($output));
-    }
-}
+test('basic without set application', function () {
+    $blade = new Blade('tests/fixtures/views', 'tests/fixtures/cache');
+    expect(trim($blade->make('basic')))
+        ->toEqual('hello world');
+});

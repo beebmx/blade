@@ -1,11 +1,13 @@
+<p align="center">
+<a href="https://github.com/beebmx/blade/actions"><img src="https://img.shields.io/github/actions/workflow/status/beebmx/blade/tests.yml?branch=main" alt="Build Status"></a>
+<a href="https://packagist.org/packages/beebmx/blade"><img src="https://img.shields.io/packagist/dt/beebmx/blade" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/beebmx/blade"><img src="https://img.shields.io/packagist/v/beebmx/blade" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/beebmx/blade"><img src="https://img.shields.io/packagist/l/beebmx/blade" alt="License"></a>
+</p>
+
 # Blade
 
-[![Latest Stable Version](https://poser.pugx.org/beebmx/blade/v)](//packagist.org/packages/beebmx/blade)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/beebmx/blade/tests.yml?branch=main)
-[![Total Downloads](http://poser.pugx.org/beebmx/blade/downloads)](https://packagist.org/packages/beebmx/blade)
-[![License](https://poser.pugx.org/beebmx/blade/license)](//packagist.org/packages/beebmx/blade)
-
-The standalone version of [Laravel's Blade templating engine](https://laravel.com/docs/9.x/blade) for use outside of Laravel.
+The standalone version of [Laravel's Blade templating engine](https://laravel.com/docs/11.x/blade) for use outside of Laravel.
 
 ## Installation
 
@@ -20,7 +22,6 @@ composer require beebmx/blade
 Create a Blade instance by passing it the folder(s) where your view files are located, and a cache folder. Render a template by calling the `make` method. More information about the Blade templating engine can be found on http://laravel.com/docs/9.x/blade.
 
 ```php
-use Beebmx\Blade\Application;
 use Beebmx\Blade\Blade;
 
 $blade = new Blade('views', 'cache');
@@ -48,7 +49,7 @@ Which allows you to use the following in your blade template:
 Current date: @datetime($date)
 ```
 
-The Blade instances passes all methods to the internal view factory. So methods such as `exists`, `file`, `share`, `composer` and `creator` are available as well. Check out the [original documentation](https://laravel.com/docs/9.x/views) for more information.
+The Blade instances passes all methods to the internal view factory. So methods such as `exists`, `file`, `share`, `composer` and `creator` are available as well. Check out the [original documentation](https://laravel.com/docs/11.x/views) for more information.
 
 ## Testing
 
