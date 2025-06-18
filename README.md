@@ -7,7 +7,7 @@
 
 # Blade
 
-The standalone version of [Laravel's Blade templating engine](https://laravel.com/docs/11.x/blade) for use outside of Laravel.
+The standalone version of [Laravel's Blade templating engine](https://laravel.com/docs/12.x/blade) for use outside of Laravel.
 
 ## Installation
 
@@ -19,7 +19,7 @@ composer require beebmx/blade
 
 ## Usage
 
-Create a Blade instance by passing it the folder(s) where your view files are located, and a cache folder. Render a template by calling the `make` method. More information about the Blade templating engine can be found on http://laravel.com/docs/9.x/blade.
+Create a Blade instance by passing it the folder(s) where your view files are located, and a cache folder. Render a template by calling the `make` method. More information about the Blade templating engine can be found on [Laravel Blade](https://laravel.com/docs/12.x/blade).
 
 ```php
 use Beebmx\Blade\Blade;
@@ -49,7 +49,7 @@ Which allows you to use the following in your blade template:
 Current date: @datetime($date)
 ```
 
-The Blade instances passes all methods to the internal view factory. So methods such as `exists`, `file`, `share`, `composer` and `creator` are available as well. Check out the [original documentation](https://laravel.com/docs/11.x/views) for more information.
+The Blade instances passes all methods to the internal view factory. So methods such as `exists`, `file`, `share`, `composer` and `creator` are available as well. Check out the [original documentation](https://laravel.com/docs/12.x/views) for more information.
 
 ## Testing
 
